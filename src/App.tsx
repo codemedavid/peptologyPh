@@ -103,7 +103,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainApp />} />
         {coaPageEnabled && <Route path="/coa" element={<COA />} />}
-        <Route path="/faq" element={<FAQ onBack={() => window.history.back()} />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>

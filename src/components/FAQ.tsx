@@ -16,11 +16,7 @@ const categoryColors: { [key: string]: string } = {
     'SHIPPING & DELIVERY': 'text-green-600 border-green-200 bg-green-50',
 };
 
-interface FAQPageProps {
-    onBack?: () => void;
-}
-
-const FAQ: React.FC<FAQPageProps> = ({ onBack }) => {
+const FAQ: React.FC = () => {
     const { faqs, categories, loading } = useFAQs();
     const [openItems, setOpenItems] = useState<Set<string>>(new Set());
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -57,14 +53,12 @@ const FAQ: React.FC<FAQPageProps> = ({ onBack }) => {
             <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center gap-4">
-                        {onBack && (
-                            <button
-                                onClick={onBack}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <ArrowLeft className="w-5 h-5 text-theme-text" />
-                            </button>
-                        )}
+                        <a
+                            href="/"
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-theme-text" />
+                        </a>
                         <div className="flex items-center gap-2">
                             <HelpCircle className="w-6 h-6 text-theme-accent" />
                             <h1 className="text-xl md:text-2xl font-bold text-theme-text">Frequently Asked Questions</h1>
@@ -79,8 +73,8 @@ const FAQ: React.FC<FAQPageProps> = ({ onBack }) => {
                     <button
                         onClick={() => setActiveCategory(null)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === null
-                                ? 'bg-theme-accent text-white'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-theme-accent'
+                            ? 'bg-theme-accent text-white'
+                            : 'bg-white text-gray-600 border border-gray-200 hover:border-theme-accent'
                             }`}
                     >
                         All
@@ -90,8 +84,8 @@ const FAQ: React.FC<FAQPageProps> = ({ onBack }) => {
                             key={category}
                             onClick={() => setActiveCategory(category)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeCategory === category
-                                    ? 'bg-theme-accent text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-theme-accent'
+                                ? 'bg-theme-accent text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:border-theme-accent'
                                 }`}
                         >
                             {categoryIcons[category]}
