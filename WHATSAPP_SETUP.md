@@ -125,14 +125,14 @@ Here's a complete example with a Philippines number:
 ```typescript
 const whatsappNumber = '639171234567'; 
 const whatsappMessage = encodeURIComponent('Hello! I want to order BPC-157.');
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${whatsappMessage}`;
 ```
 
 **Footer.tsx:**
 ```typescript
 const whatsappNumber = '639171234567';
 const whatsappMessage = encodeURIComponent('Hi! I would like to know more about your peptides.');
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${whatsappMessage}`;
 ```
 
 ---

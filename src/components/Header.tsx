@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCOAPageSetting } from '../hooks/useCOAPageSetting';
-import { ShoppingCart, Menu, X, MessageCircle, HelpCircle } from 'lucide-react';
+import { ShoppingCart, Menu, X, MessageCircle } from 'lucide-react';
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
 
   // Contact Links
   const whatsappMessage = encodeURIComponent('Hi! I am interested in your products.');
-  const whatsappUrl = `https://wa.me/639062349763?text=${whatsappMessage}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=639062349763&text=${whatsappMessage}`;
 
   return (
     <>

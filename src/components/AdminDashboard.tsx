@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, ArrowLeft, Package, CreditCard, Sparkles, Layers, Shield, RefreshCw, Warehouse, ShoppingCart, HelpCircle, MapPin, Check } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, ArrowLeft, Package, CreditCard, Sparkles, Layers, Shield, RefreshCw, Warehouse, ShoppingCart, HelpCircle, MapPin, Check, Tag } from 'lucide-react';
 import type { Product } from '../types';
 import { useMenu } from '../hooks/useMenu';
 import { useCategories } from '../hooks/useCategories';
@@ -13,6 +13,7 @@ import OrdersManager from './OrdersManager';
 import FAQManager from './FAQManager';
 import ShippingManager from './ShippingManager';
 import SiteSettingsManager from './SiteSettingsManager';
+import PromoManager from './PromoManager';
 
 
 const AdminDashboard: React.FC = () => {
@@ -23,7 +24,7 @@ const AdminDashboard: React.FC = () => {
   const [loginError, setLoginError] = useState('');
   const { products, loading, addProduct, updateProduct, deleteProduct, refreshProducts } = useMenu();
   const { categories } = useCategories();
-  const [currentView, setCurrentView] = useState<'dashboard' | 'products' | 'add' | 'edit' | 'categories' | 'payments' | 'coa' | 'inventory' | 'orders' | 'faq' | 'shipping' | 'settings'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'products' | 'add' | 'edit' | 'categories' | 'payments' | 'coa' | 'inventory' | 'orders' | 'faq' | 'shipping' | 'settings' | 'promo'>('dashboard');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [managingVariationsProductId, setManagingVariationsProductId] = useState<string | null>(null);
@@ -1129,6 +1130,15 @@ const AdminDashboard: React.FC = () => {
     return <SiteSettingsManager onBack={() => setCurrentView('dashboard')} />;
   }
 
+  // Promo Manager View
+  if (currentView === 'promo') {
+    return (
+      <div className="min-h-screen bg-theme-bg">
+        <PromoManager onBack={() => setCurrentView('dashboard')} />
+      </div>
+    );
+  }
+
   // Dashboard View
   if (currentView === 'dashboard') {
     return (
@@ -1338,6 +1348,19 @@ const AdminDashboard: React.FC = () => {
               </div>
               <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-gray-800 transition-colors">Settings</h3>
               <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Site config.</p>
+            </button>
+
+            {/* Promo Vouchers Card */}
+            <button
+              onClick={() => setCurrentView('promo')}
+              className="bg-white p-4 md:p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-medium transition-all group text-left relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+              <div className="p-2 md:p-3 bg-pink-50 rounded-lg w-fit mb-3 md:mb-4 group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                <Tag className="w-4 h-4 md:w-6 md:h-6 text-pink-600 group-hover:text-white" />
+              </div>
+              <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-pink-600 transition-colors">Vouchers</h3>
+              <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Manage promos.</p>
             </button>
 
           </div>

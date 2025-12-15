@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ShieldCheck, Package, CreditCard, Sparkles, Heart, Copy, Check, MessageCircle } from 'lucide-react';
-import type { CartItem } from '../types';
+import { ArrowLeft, ShieldCheck, Package, CreditCard, Sparkles, Heart, Copy, Check, MessageCircle, Tag, X } from 'lucide-react';
+import type { CartItem, PromoCode } from '../types';
 import { usePaymentMethods } from '../hooks/usePaymentMethods';
 import { useShippingLocations } from '../hooks/useShippingLocations';
 import { useSiteSettings } from '../hooks/useSiteSettings';
@@ -39,6 +39,12 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
   const [notes, setNotes] = useState('');
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
 
+  // Promo Code
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const [isCheckingPromo, setIsCheckingPromo] = useState(false);
+
   // Order message for copying
   const [orderMessage, setOrderMessage] = useState<string>('');
   const [copied, setCopied] = useState(false);
@@ -56,7 +62,65 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
 
   // Calculate shipping fee based on location (uses dynamic fees from database)
   const shippingFee = shippingLocation ? getShippingFee(shippingLocation) : 0;
-  const finalTotal = totalPrice + shippingFee;
+
+  // Calculate Discount
+  const discountAmount = appliedPromo
+    ? (appliedPromo.discount_type === 'percentage'
+      ? (totalPrice * appliedPromo.discount_value / 100)
+      : appliedPromo.discount_value)
+    : 0;
+
+  // Ensure discount doesn't exceed total (mostly relevant for fixed amounts)
+  const actualDiscount = Math.min(discountAmount, totalPrice);
+  const finalTotal = Math.max(0, totalPrice + shippingFee - actualDiscount);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoError('');
+    setIsCheckingPromo(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('promo_codes')
+        .select('*')
+        .eq('code', promoCode.toUpperCase())
+        .eq('is_active', true)
+        .single();
+
+      if (error || !data) {
+        setPromoError('Invalid or inactive promo code.');
+        setAppliedPromo(null);
+        return;
+      }
+
+      // Check min spend
+      if (totalPrice < data.min_spend) {
+        setPromoError(`Minimum spend of ₱${data.min_spend} required.`);
+        setAppliedPromo(null);
+        return;
+      }
+
+      // Check usage limit
+      if (data.usage_limit !== null && data.usage_count >= data.usage_limit) {
+        setPromoError('This promo code has reached its usage limit.');
+        setAppliedPromo(null);
+        return;
+      }
+
+      setAppliedPromo(data);
+      setPromoCode(''); // Clear input on success
+    } catch (err) {
+      console.error('Error checking promo:', err);
+      setPromoError('Failed to apply promo code.');
+    } finally {
+      setIsCheckingPromo(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoError('');
+  };
 
   const isDetailsValid =
     fullName.trim() !== '' &&
@@ -129,7 +193,9 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
           contact_method: contactMethod || null,
           notes: `Courier Preference: ${courier === 'jnt' ? 'J&T Express' : 'Lalamove'}\n${notes.trim() || ''}`.trim(),
           order_status: 'new',
-          payment_status: 'pending'
+          payment_status: 'pending',
+          promo_code_id: appliedPromo?.id || null,
+          discount_amount: actualDiscount || 0
         }])
         .select()
         .single();
@@ -199,7 +265,7 @@ ${cartItems.map(item => {
 💰 PRICING
 Product Total: ₱${totalPrice.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
 Shipping Fee: ₱${shippingFee.toLocaleString('en-PH', { minimumFractionDigits: 0 })} (${shippingLocation.replace('_', ' & ')})
-Grand Total: ₱${finalTotal.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
+${appliedPromo ? `Discount (${appliedPromo.code}): -₱${actualDiscount.toLocaleString('en-PH', { minimumFractionDigits: 0 })}\n` : ''}Grand Total: ₱${finalTotal.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
 
 💳 PAYMENT METHOD
 ${paymentMethod?.name || 'N/A'}
@@ -210,7 +276,7 @@ ${paymentProof}
 (Please also attach the screenshot image)
 
 📱 CONTACT METHOD
-WhatsApp: https://wa.me/639062349763
+WhatsApp: https://api.whatsapp.com/send?phone=639062349763
 
 📋 ORDER ID: ${orderData.id}
 
@@ -222,7 +288,7 @@ Please confirm this order. Thank you!
 
       // Open contact method based on selection
       const contactUrl = contactMethod === 'whatsapp'
-        ? `https://wa.me/639062349763?text=${encodeURIComponent(orderDetails)}`
+        ? `https://api.whatsapp.com/send?phone=639062349763&text=${encodeURIComponent(orderDetails)}`
         : null;
 
       if (contactUrl) {
@@ -281,7 +347,7 @@ Please confirm this order. Thank you!
 
   const handleOpenContact = () => {
     const contactUrl = contactMethod === 'whatsapp'
-      ? `https://wa.me/639062349763?text=${encodeURIComponent(orderMessage)}`
+      ? `https://api.whatsapp.com/send?phone=639062349763&text=${encodeURIComponent(orderMessage)}`
       : null;
 
     if (contactUrl) {
@@ -696,11 +762,55 @@ Please confirm this order. Thank you!
                     <span className="font-medium">₱{totalPrice.toLocaleString('en-PH', { minimumFractionDigits: 0 })}</span>
                   </div>
                   <div className="flex justify-between text-gray-600 text-xs">
-                    <span>Shipping</span>
                     <span className="font-medium text-theme-secondary">
                       {shippingLocation ? `₱${shippingFee.toLocaleString('en-PH', { minimumFractionDigits: 0 })}` : 'Select location'}
                     </span>
                   </div>
+
+                  {/* Promo Code Section */}
+                  <div className="pt-2">
+                    {!appliedPromo ? (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          placeholder="Enter voucher code"
+                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-theme-accent"
+                        />
+                        <button
+                          onClick={handleApplyPromo}
+                          disabled={!promoCode || isCheckingPromo}
+                          className="px-3 py-2 bg-theme-text text-white text-sm font-medium rounded-lg disabled:opacity-50 hover:bg-theme-accent transition-colors"
+                        >
+                          {isCheckingPromo ? '...' : 'Apply'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-2 px-3">
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-green-600" />
+                          <div>
+                            <p className="text-xs font-bold text-green-700">{appliedPromo.code}</p>
+                            <p className="text-[10px] text-green-600">
+                              -{appliedPromo.discount_type === 'percentage' ? `${appliedPromo.discount_value}%` : `₱${appliedPromo.discount_value}`}
+                            </p>
+                          </div>
+                        </div>
+                        <button onClick={handleRemovePromo} className="text-gray-400 hover:text-red-500">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                    {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
+                  </div>
+
+                  {appliedPromo && (
+                    <div className="flex justify-between text-green-600 text-sm font-medium">
+                      <span>Discount</span>
+                      <span>-₱{actualDiscount.toLocaleString('en-PH', { minimumFractionDigits: 0 })}</span>
+                    </div>
+                  )}
                   <div className="border-t-2 border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-gray-900">Total</span>

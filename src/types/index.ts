@@ -66,6 +66,20 @@ export interface PaymentMethod {
   updated_at: string;
 }
 
+export interface PromoCode {
+  id: string;
+  code: string;
+  description: string | null;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  min_spend: number;
+  usage_limit: number | null;
+  usage_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface SiteSetting {
   id: string;
   value: string;
