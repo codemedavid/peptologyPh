@@ -294,7 +294,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                           */
                         }
                       }}
-                      className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 w-[60px] sm:w-[70px] text-center border-none focus:ring-0 p-0 appearance-none bg-transparent"
+                      className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 w-[60px] sm:w-[70px] text-center border-none focus:ring-0 p-0 appearance-none bg-transparent no-spinner"
                     />
                     <button
                       onClick={incrementQuantity}

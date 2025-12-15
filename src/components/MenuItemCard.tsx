@@ -50,7 +50,7 @@ const QuantityInput: React.FC<{
       onChange={handleChange}
       onBlur={handleBlur}
       onClick={(e) => e.stopPropagation()}
-      className="w-8 sm:w-10 text-center text-xs sm:text-sm font-medium text-theme-text border-none focus:ring-0 p-0 appearance-none bg-transparent"
+      className="w-8 sm:w-10 text-center text-xs sm:text-sm font-medium text-theme-text border-none focus:ring-0 p-0 appearance-none bg-transparent no-spinner"
     />
   );
 };

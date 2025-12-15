@@ -63,7 +63,7 @@ const CartQuantityInput: React.FC<{
       onChange={handleChange}
       onBlur={handleBlur}
       disabled={disabled}
-      className="px-2 w-16 text-center font-bold text-gray-800 text-sm md:text-base border-none focus:ring-0 bg-transparent appearance-none"
+      className="px-2 w-16 text-center font-bold text-gray-800 text-sm md:text-base border-none focus:ring-0 bg-transparent appearance-none no-spinner"
     />
   );
 };

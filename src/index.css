@@ -102,14 +102,17 @@ h6 {
 }
 
 /* Remove number input spinners */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+@layer utilities {
 
-input[type=number] {
-  -moz-appearance: textfield;
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .no-spinner {
+    -moz-appearance: textfield;
+  }
 }
 
 /* Animations */
