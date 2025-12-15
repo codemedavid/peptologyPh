@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Plus, Minus, Sparkles, Heart } from 'lucide-react';
 import type { CartItem } from '../types';
 
@@ -11,6 +11,62 @@ interface CartProps {
   onContinueShopping: () => void;
   onCheckout: () => void;
 }
+
+// CartQuantityInput moved to top
+const CartQuantityInput: React.FC<{
+  value: number;
+  max: number;
+  onChange: (val: number) => void;
+  disabled?: boolean;
+}> = ({ value, max, onChange, disabled }) => {
+  const [localValue, setLocalValue] = useState<string>(value.toString());
+
+  // Update local value if prop value changes (e.g. from buttons)
+  useEffect(() => {
+    setLocalValue(value.toString());
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVal = e.target.value;
+    setLocalValue(newVal);
+
+    // Only trigger update if it's a valid number
+    if (newVal !== '') {
+      const parsed = parseInt(newVal);
+      if (!isNaN(parsed) && parsed > 0) {
+        onChange(parsed);
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    let parsed = parseInt(localValue);
+    if (isNaN(parsed) || parsed < 1) {
+      parsed = 1;
+    } else if (max > 0 && parsed > max) {
+      if (parsed > max) {
+        alert(`Only ${max} item(s) available in stock.`);
+        parsed = max;
+      }
+    }
+
+    setLocalValue(parsed.toString());
+    onChange(parsed);
+  };
+
+  return (
+    <input
+      type="number"
+      min="1"
+      max={max > 0 ? max : 999}
+      value={localValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      disabled={disabled}
+      className="px-2 w-16 text-center font-bold text-gray-800 text-sm md:text-base border-none focus:ring-0 bg-transparent appearance-none"
+    />
+  );
+};
 
 const Cart: React.FC<CartProps> = ({
   cartItems,
@@ -142,16 +198,26 @@ const Cart: React.FC<CartProps> = ({
                         >
                           <Minus className="w-3 h-3 md:w-4 md:h-4 text-black" />
                         </button>
-                        <span className="px-3 md:px-4 py-1.5 md:py-2 font-bold text-gray-800 min-w-[32px] md:min-w-[40px] text-center text-sm md:text-base">
-                          {item.quantity}
-                          {(() => {
+                        <CartQuantityInput
+                          value={item.quantity}
+                          max={(() => {
                             const availableStock = item.variation ? item.variation.stock_quantity : item.product.stock_quantity;
-                            if (availableStock > 0) {
-                              return <span className="block text-[10px] text-gray-500">/ {availableStock}</span>;
-                            }
-                            return null;
+                            return availableStock > 0 ? availableStock : 999;
                           })()}
-                        </span>
+                          onChange={(val) => updateQuantity(index, val)}
+                          disabled={(() => {
+                            // Logic for disabled? Usually not disabled unless out of stock?
+                            // But item is in cart, so at least 1 exists.
+                            return false;
+                          })()}
+                        />
+                        {(() => {
+                          const availableStock = item.variation ? item.variation.stock_quantity : item.product.stock_quantity;
+                          if (availableStock > 0) {
+                            return <span className="block text-[10px] text-gray-500 text-center">/ {availableStock}</span>;
+                          }
+                          return null;
+                        })()}
                         <button
                           onClick={() => {
                             const availableStock = item.variation ? item.variation.stock_quantity : item.product.stock_quantity;
@@ -258,5 +324,7 @@ const Cart: React.FC<CartProps> = ({
     </div>
   );
 };
+
+
 
 export default Cart;

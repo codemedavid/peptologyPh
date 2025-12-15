@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Package, Beaker, ShoppingCart, Plus, Minus, Sparkles, Shield } from 'lucide-react';
+import { X, Package, Beaker, ShoppingCart, Plus, Minus, Sparkles } from 'lucide-react';
 import type { Product, ProductVariation } from '../types';
 
 interface ProductDetailModalProps {
@@ -135,10 +135,10 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                   <div className="flex justify-between">
                     <span className="text-gray-600 text-[11px] sm:text-xs md:text-sm">Stock:</span>
                     <span className={`font-medium text-[11px] sm:text-xs md:text-sm ${(product.variations && product.variations.length > 0
-                        ? product.variations.some(v => v.stock_quantity > 0)
-                        : product.stock_quantity > 0)
-                        ? 'text-gold-600'
-                        : 'text-red-600'
+                      ? product.variations.some(v => v.stock_quantity > 0)
+                      : product.stock_quantity > 0)
+                      ? 'text-gold-600'
+                      : 'text-red-600'
                       }`}>
                       {product.variations && product.variations.length > 0
                         ? product.variations.reduce((sum, v) => sum + v.stock_quantity, 0)
@@ -220,9 +220,36 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                     >
                       <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gold-600" />
                     </button>
-                    <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 min-w-[40px] sm:min-w-[50px] md:min-w-[60px] text-center">
-                      {quantity}
-                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={hasAnyStock && selectedVariation ? selectedVariation.stock_quantity : (product.stock_quantity || 999)}
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (!isNaN(val)) {
+                          // Allow input > max, will be clamped on blur or add to cart?
+                          // Standard UI: Clamping immediately can be annoying while typing (e.g. typing 10, first '1' might be valid, then '0' OK).
+                          // Just set it.
+                          setQuantity(val);
+                        } else if (e.target.value === '') {
+                          // Allow empty temporary
+                          // @ts-expect-error allows temporary empty state
+                          setQuantity('');
+                        }
+                      }}
+                      onBlur={(e) => {
+                        let val = parseInt(e.target.value);
+                        if (isNaN(val) || val < 1) val = 1;
+
+                        const maxStock = selectedVariation ? selectedVariation.stock_quantity : product.stock_quantity;
+                        if (maxStock > 0 && val > maxStock) {
+                          val = maxStock;
+                        }
+                        setQuantity(val);
+                      }}
+                      className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 w-[60px] sm:w-[70px] text-center border-none focus:ring-0 p-0 appearance-none bg-transparent"
+                    />
                     <button
                       onClick={incrementQuantity}
                       className="p-2 sm:p-2.5 md:p-3 bg-white border-2 border-gold-300/30 hover:bg-gold-50 hover:border-gold-400 rounded-lg sm:rounded-xl transition-all shadow-sm"
