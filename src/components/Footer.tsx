@@ -1,60 +1,48 @@
 import React from 'react';
-import { MessageCircle, Shield, Heart, HelpCircle } from 'lucide-react';
-import { useCOAPageSetting } from '../hooks/useCOAPageSetting';
+import { Link } from 'react-router-dom';
+import { MessageCircle, Heart } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const { coaPageEnabled } = useCOAPageSetting();
 
   // Contact Links
   const whatsappMessage = encodeURIComponent('Hi! I would like to inquire about your products.');
-  const whatsappUrl = `https://api.whatsapp.com/send?phone=639062349763&text=${whatsappMessage}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=639179243135&text=${whatsappMessage}`;
 
   return (
-    <footer className="bg-white border-t border-gray-100 pt-12 pb-6">
+    <footer className="bg-theme-navy text-white border-t border-theme-blue/10 pt-16 pb-8">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
 
           {/* Brand Section */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-theme-blue/20">
               <img
-                src="/assets/logo.jpg"
+                src="/assets/logo.png"
                 alt="peptalk.ph"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="text-left">
-              <div className="font-bold text-theme-text text-lg tracking-tight">
+              <div className="font-bold text-white text-xl tracking-tight">
                 peptalk.ph
               </div>
-              <div className="text-xs text-gray-500">Peptides & Essentials</div>
+              <div className="text-sm text-theme-blue font-medium tracking-wide uppercase">Peptides & Essentials</div>
+
+              <div className="mt-4 flex gap-6 text-sm">
+                <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
+                <Link to="/journey" className="text-gray-400 hover:text-white transition-colors">Our Journey</Link>
+                <Link to="/guides" className="text-gray-400 hover:text-white transition-colors">Smart Guides</Link>
+              </div>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="flex flex-wrap items-center gap-4 justify-center md:justify-end">
-            {coaPageEnabled && (
-              <a
-                href="/coa"
-                className="flex items-center gap-2 text-gray-600 hover:text-theme-accent transition-colors text-sm font-medium"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Lab Reports</span>
-              </a>
-            )}
-            <a
-              href="/faq"
-              className="flex items-center gap-2 text-gray-600 hover:text-theme-accent transition-colors text-sm font-medium"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span>FAQ</span>
-            </a>
+          <div className="flex flex-wrap items-center gap-6 justify-center md:justify-end">
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-gray-600 hover:text-theme-accent transition-colors text-sm font-medium"
+              className="flex items-center gap-2 text-gray-300 hover:text-theme-blue transition-colors text-sm font-medium px-4 py-2 rounded-full border border-theme-blue/20 hover:border-theme-blue/50"
             >
               <MessageCircle className="w-4 h-4" />
               <span>WhatsApp</span>
@@ -64,11 +52,11 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Footer Bottom */}
-        <div className="border-t border-gray-100 pt-6 text-center">
-          <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
+        <div className="border-t border-gray-800 pt-8 text-center">
+          <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
             Made with
-            <Heart className="w-3 h-3 text-theme-secondary fill-theme-secondary" />
-            © {currentYear} peptalk.ph.
+            <Heart className="w-3 h-3 text-theme-red fill-theme-red" />
+            © {currentYear} peptalk.ph. All rights reserved.
           </p>
         </div>
       </div>

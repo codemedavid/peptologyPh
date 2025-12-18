@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCOAPageSetting } from '../hooks/useCOAPageSetting';
+import { Link } from 'react-router-dom';
 import { ShoppingCart, Menu, X, MessageCircle } from 'lucide-react';
 
 interface HeaderProps {
@@ -10,15 +10,14 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { coaPageEnabled } = useCOAPageSetting();
 
   // Contact Links
   const whatsappMessage = encodeURIComponent('Hi! I am interested in your products.');
-  const whatsappUrl = `https://api.whatsapp.com/send?phone=639062349763&text=${whatsappMessage}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=639179243135&text=${whatsappMessage}`;
 
   return (
     <>
-      <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
+      <header className="bg-theme-navy sticky top-0 z-50 border-b border-theme-blue/20 shadow-lg backdrop-blur-sm bg-theme-navy/95">
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo and Brand */}
@@ -27,20 +26,20 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
               className="flex items-center space-x-3 hover:opacity-80 transition-all group min-w-0 flex-1 max-w-[calc(100%-130px)] sm:max-w-none sm:flex-initial"
             >
               <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-gray-200">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-theme-blue/30 shadow-inner">
                   <img
-                    src="/assets/logo.jpg"
+                    src="/assets/logo.png"
                     alt="peptalk.ph"
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
               <div className="text-left min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl font-bold text-theme-text leading-tight whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
+                <h1 className="text-lg sm:text-xl font-bold text-white leading-tight whitespace-nowrap overflow-hidden text-ellipsis tracking-tight">
                   peptalk.ph
                 </h1>
-                <p className="text-xs text-gray-500 font-medium flex items-center gap-1">
-                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                <p className="text-xs text-theme-blue font-medium flex items-center gap-1">
+                  <span className="whitespace-nowrap overflow-hidden text-ellipsis uppercase tracking-wider">
                     Peptides & Essentials
                   </span>
                 </p>
@@ -50,32 +49,25 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
             {/* Right Side Navigation */}
             <div className="flex items-center gap-2 md:gap-4 ml-auto">
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center gap-2 lg:gap-4">
+              <nav className="hidden md:flex items-center gap-8">
+                <Link to="/" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Home</Link>
                 <button
-                  onClick={onMenuClick}
-                  className="text-sm font-medium text-gray-600 hover:text-theme-accent transition-colors"
+                  onClick={() => onMenuClick()}
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Products
+                  Shop
                 </button>
-                {coaPageEnabled && (
-                  <a
-                    href="/coa"
-                    className="text-sm font-medium text-gray-600 hover:text-theme-accent transition-colors"
-                  >
-                    Lab Reports
-                  </a>
-                )}
-                <a
-                  href="/faq"
-                  className="text-sm font-medium text-gray-600 hover:text-theme-accent transition-colors"
-                >
-                  FAQ
-                </a>
+                <Link to="/journey" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Our Journey</Link>
+                <Link to="/guides" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Guides</Link>
+                <Link to="/assessment" className="text-sm font-medium text-theme-blue bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all border border-transparent hover:border-theme-blue/30 backdrop-blur-sm">
+                  Start Assessment
+                </Link>
+                <div className="h-4 w-px bg-white/20 mx-2"></div>
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-600 hover:text-theme-accent transition-colors text-sm font-medium"
+                  className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors text-sm font-medium"
                 >
                   <MessageCircle className="w-4 h-4" />
                   WhatsApp
@@ -85,11 +77,11 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
               {/* Cart Button */}
               <button
                 onClick={onCartClick}
-                className="relative p-2 text-theme-text hover:text-theme-accent transition-colors"
+                className="relative p-2 text-white hover:text-theme-blue transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-theme-secondary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute top-0 right-0 bg-theme-blue text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-theme-navy">
                     {cartItemsCount}
                   </span>
                 )}
@@ -98,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-theme-text hover:text-theme-accent transition-colors"
+                className="md:hidden p-2 text-white hover:text-theme-blue transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -114,9 +106,9 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-black bg-opacity-20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+        <div className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
           <div
-            className="absolute top-[65px] right-0 left-0 bg-white shadow-soft animate-slideIn border-b border-gray-100"
+            className="absolute top-[65px] right-0 left-0 bg-theme-navy shadow-xl animate-slideIn border-b border-theme-blue/20"
             onClick={(e) => e.stopPropagation()}
           >
             <nav className="px-4 py-6">
@@ -126,32 +118,30 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
                     onMenuClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-theme-text font-medium text-base hover:text-theme-accent transition-colors"
+                  className="text-left text-white font-medium text-base hover:text-theme-blue transition-colors border-l-2 border-transparent hover:border-theme-blue pl-4 py-1"
                 >
-                  Products
+                  Shop
                 </button>
-                {coaPageEnabled && (
-                  <a
-                    href="/coa"
-                    className="text-left text-theme-text font-medium text-base hover:text-theme-accent transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Lab Reports
-                  </a>
-                )}
-                <a
-                  href="/faq"
-                  className="text-left text-theme-text font-medium text-base hover:text-theme-accent transition-colors"
+                <Link
+                  to="/journey"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="text-left text-white font-medium text-base hover:text-theme-blue transition-colors border-l-2 border-transparent hover:border-theme-blue pl-4 py-1"
                 >
-                  FAQ
-                </a>
-                <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
+                  Our Journey
+                </Link>
+                <Link
+                  to="/guides"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-left text-white font-medium text-base hover:text-theme-blue transition-colors border-l-2 border-transparent hover:border-theme-blue pl-4 py-1"
+                >
+                  Smart Guides
+                </Link>
+                <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
                   <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-600 hover:text-theme-accent transition-colors"
+                    className="flex items-center gap-3 text-gray-300 hover:text-theme-blue transition-colors pl-4"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <MessageCircle className="w-5 h-5" />

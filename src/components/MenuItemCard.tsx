@@ -99,16 +99,16 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
   const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
 
   return (
-    <div className="card h-full flex flex-col group relative">
+    <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border-t-4 border-theme-blue overflow-hidden h-full flex flex-col group relative">
       {/* Click overlay for product details */}
       <div
         onClick={() => onProductClick?.(product)}
-        className="absolute inset-x-0 top-0 h-48 z-10 cursor-pointer"
+        className="absolute inset-x-0 top-0 h-32 z-10 cursor-pointer"
         title="View details"
       />
 
-      {/* Product Image */}
-      <div className="relative h-48 bg-gray-50 overflow-hidden rounded-t-lg">
+      {/* Product Image - Reduced height for compact feel */}
+      <div className="relative h-32 bg-theme-lightblue/10 overflow-hidden">
         {product.image_url ? (
           <img
             src={product.image_url}
@@ -116,20 +116,20 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-300">
-            <Package className="w-12 h-12" />
+          <div className="w-full h-full flex items-center justify-center text-theme-blue/30">
+            <Package className="w-8 h-8" />
           </div>
         )}
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 pointer-events-none">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
           {product.featured && (
-            <span className="badge badge-accent">
+            <span className="bg-theme-blue text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
               Featured
             </span>
           )}
           {hasDiscount && (
-            <span className="badge bg-theme-secondary text-white">
+            <span className="bg-theme-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
               {Math.round((1 - currentPrice / product.base_price) * 100)}% OFF
             </span>
           )}
@@ -137,8 +137,8 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
 
         {/* Stock Status Overlay */}
         {!hasAnyStock && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-            <span className="bg-gray-900 text-white px-3 py-1 text-xs font-semibold rounded">
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+            <span className="bg-theme-navy text-white px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wide">
               Out of Stock
             </span>
           </div>
@@ -146,14 +146,14 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
       </div>
 
       {/* Product Details */}
-      <div className="p-4 flex-1 flex flex-col">
-        <h3 className="font-semibold text-theme-text mb-1 line-clamp-2">{product.name}</h3>
-        <p className="text-sm text-gray-500 mb-3 line-clamp-2 min-h-[2.5rem]">{product.description}</p>
+      <div className="p-3 sm:p-5 flex-1 flex flex-col">
+        <h3 className="font-bold text-theme-navy text-sm sm:text-lg mb-1 line-clamp-2 leading-tight group-hover:text-theme-blue transition-colors">{product.name}</h3>
+        <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] leading-relaxed">{product.description}</p>
 
         {/* Variations (Sizes) */}
-        <div className="mb-4 min-h-[4rem]">
+        <div className="mb-3 sm:mb-4 min-h-[2.5rem] sm:min-h-[3rem]">
           {product.variations && product.variations.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {product.variations.slice(0, 3).map((variation) => {
                 const isOutOfStock = variation.stock_quantity === 0;
                 return (
@@ -167,12 +167,12 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
                     }}
                     disabled={isOutOfStock}
                     className={`
-                      px-2 py-1 text-xs rounded border transition-colors relative z-20
+                      px-2 py-1 text-[10px] sm:text-xs font-medium rounded-md border transition-all relative z-20
                       ${selectedVariation?.id === variation.id && !isOutOfStock
-                        ? 'bg-theme-text text-white border-theme-text'
+                        ? 'bg-theme-navy text-white border-theme-navy shadow-sm'
                         : isOutOfStock
                           ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-theme-text'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-theme-blue hover:text-theme-blue'
                       }
                     `}
                   >
@@ -181,7 +181,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
                 );
               })}
               {product.variations.length > 3 && (
-                <span className="text-xs text-gray-400 self-center">
+                <span className="text-[10px] sm:text-xs text-gray-400 self-center font-medium">
                   +{product.variations.length - 3}
                 </span>
               )}
@@ -192,45 +192,47 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
         <div className="flex-1" />
 
         {/* Price and Cart Actions */}
-        <div className="flex flex-col gap-3 mt-2">
+        <div className="flex flex-col gap-2 sm:gap-3 mt-1 sm:mt-2">
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-theme-text">
+            <span className="text-lg sm:text-xl font-bold text-theme-navy">
               ₱{currentPrice.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
             </span>
             {hasDiscount && (
-              <span className="text-sm text-gray-400 line-through">
+              <span className="text-xs sm:text-sm text-gray-400 line-through decoration-gray-300">
                 ₱{product.base_price.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 relative z-20">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 relative z-20">
             {/* Quantity Controls */}
-            <div className="flex items-center border border-gray-200 rounded-md flex-shrink-0">
+            <div className="flex items-center justify-between border border-gray-200 rounded-lg bg-gray-50 sm:w-auto">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   decrementQuantity();
                 }}
-                className="p-1 sm:p-1.5 hover:bg-gray-50 transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors rounded-l-lg text-gray-500 hover:text-theme-navy flex-1 sm:flex-none flex justify-center"
                 disabled={!hasAnyStock}
               >
-                <Minus className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                <Minus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
-              <QuantityInput
-                value={quantity}
-                max={availableStock}
-                onChange={setQuantity}
-              />
+              <div className="w-8 flex justify-center">
+                <QuantityInput
+                  value={quantity}
+                  max={availableStock}
+                  onChange={setQuantity}
+                />
+              </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   incrementQuantity();
                 }}
-                className="p-1 sm:p-1.5 hover:bg-gray-50 transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors rounded-r-lg text-gray-500 hover:text-theme-navy flex-1 sm:flex-none flex justify-center"
                 disabled={quantity >= availableStock || !hasAnyStock}
               >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
 
@@ -246,16 +248,16 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
                 handleAddToCart();
               }}
               disabled={!hasAnyStock || availableStock === 0}
-              className="flex-1 min-w-0 bg-theme-text text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 sm:gap-2"
+              className="flex-1 min-w-0 bg-theme-blue text-white px-3 py-2 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-theme-blue/90 hover:shadow-lg hover:shadow-theme-blue/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group/btn"
             >
-              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 group-hover/btn:scale-110 transition-transform" />
               <span>Add</span>
             </button>
           </div>
 
           {/* Cart Status */}
           {cartQuantity > 0 && (
-            <div className="text-center text-xs text-theme-accent font-medium">
+            <div className="text-center text-xs text-theme-blue font-medium bg-theme-blue/5 py-1 rounded-md">
               {cartQuantity} in cart
             </div>
           )}

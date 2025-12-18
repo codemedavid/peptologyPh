@@ -177,22 +177,6 @@ const OrdersManager: React.FC<OrdersManagerProps> = ({ onBack }) => {
 
       if (updateError) throw updateError;
 
-      // Update promo code usage if applicable
-      if (order.promo_code_id) {
-        const { data: promo } = await supabase
-          .from('promo_codes')
-          .select('usage_count')
-          .eq('id', order.promo_code_id)
-          .single();
-
-        if (promo) {
-          await supabase
-            .from('promo_codes')
-            .update({ usage_count: (promo.usage_count || 0) + 1 })
-            .eq('id', order.promo_code_id);
-        }
-      }
-
       // Refresh orders and products
       await loadOrders();
       await refreshProducts();

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Sparkles, FlaskConical } from 'lucide-react';
 
 import { useSiteSettings } from '../hooks/useSiteSettings';
@@ -8,100 +9,105 @@ type HeroProps = {
 };
 
 const Hero: React.FC<HeroProps> = ({ onShopAll }) => {
+  const navigate = useNavigate();
   const { siteSettings } = useSiteSettings();
+
+  // Content Fallbacks (Clinical Futurism Theme)
+  const badge = siteSettings?.home_hero_badge || 'Advanced Peptide Solutions';
+  const titlePrefix = siteSettings?.home_hero_title_prefix || 'The Science';
+  const titleHighlight = siteSettings?.home_hero_title_highlight || 'of Renewal';
+  const titleSuffix = siteSettings?.home_hero_title_suffix || '';
+  const subtext = siteSettings?.home_hero_subtext || 'Advanced peptide solutions backed by science.';
+  const description = siteSettings?.home_hero_description || 'Experience the future of wellness with our research-grade peptides. Meticulously tested for purity, designed for longevity, and trusted by experts for superior results.';
+
   return (
-    <div className="relative overflow-hidden bg-theme-bg pt-12 pb-16 md:pt-20 md:pb-24 lg:pt-28 lg:pb-32">
-      {/* Abstract Background Shape */}
-      <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-theme-accent/5 blur-3xl opacity-50 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-80 h-80 rounded-full bg-theme-secondary/5 blur-3xl opacity-50 pointer-events-none" />
+    <div className="relative overflow-hidden bg-theme-navy text-white pt-12 pb-16 md:pt-32 md:pb-40 lg:pt-40 lg:pb-48">
+      {/* Abstract Background Shapes (DNA/Molecular effect) */}
+      <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[300px] md:w-[600px] h-[300px] md:h-[600px] rounded-full bg-gradient-to-br from-theme-blue/20 to-theme-lightblue/5 blur-3xl opacity-40 pointer-events-none animate-pulse-slow" />
+      <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-[250px] md:w-[500px] h-[250px] md:h-[500px] rounded-full bg-gradient-to-tr from-theme-blue/10 to-theme-navy blur-3xl opacity-40 pointer-events-none" />
+
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay pointer-events-none"></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-100 shadow-sm mb-6 md:mb-8 animate-fadeIn">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-theme-secondary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-theme-secondary"></span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-theme-blue/10 border border-theme-blue/30 shadow-lg shadow-theme-blue/10 mb-6 md:mb-10 animate-fadeIn cursor-default backdrop-blur-sm">
+            <span className="relative flex h-2 w-2 md:h-2.5 md:w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-theme-blue opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-theme-blue"></span>
             </span>
-            <span className="text-xs md:text-sm font-medium text-gray-600 tracking-wide">
-              {siteSettings?.home_hero_badge || 'Peptides & Essentials'}
+            <span className="text-[10px] md:text-sm font-semibold text-theme-lightblue tracking-widest uppercase">
+              {badge}
             </span>
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-theme-text mb-4 md:mb-6 tracking-tight leading-tight">
-            {siteSettings?.home_hero_title_prefix}{' '}
-            <span className="text-theme-accent">{siteSettings?.home_hero_title_highlight}</span>{' '}
-            {siteSettings?.home_hero_title_suffix}
-            <br className="hidden md:block" />
-            <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-600">
-              {siteSettings?.home_hero_subtext}
-            </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-white mb-4 md:mb-10 tracking-tight leading-[1.1]">
+            <span className="block">{titlePrefix}</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-theme-lightblue via-white to-theme-blue pb-1">{titleHighlight}</span>
+            {titleSuffix && <span className="block">{titleSuffix}</span>}
           </h1>
 
-          {/* Tagline */}
-          <p className="text-sm md:text-base text-theme-accent font-medium mb-4 md:mb-6">
-            {siteSettings?.home_hero_tagline}
+          {/* Subtext */}
+          <p className="text-base sm:text-xl md:text-2xl text-theme-lightblue/90 font-light mb-6 md:mb-12 max-w-3xl mx-auto tracking-wide px-4">
+            {subtext}
           </p>
 
-          {/* Subheading */}
-          <p className="text-base md:text-lg text-gray-500 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed">
-            {siteSettings?.home_hero_description}
+          {/* Description */}
+          <p className="text-sm md:text-lg text-gray-400 mb-8 md:mb-16 max-w-2xl mx-auto leading-relaxed antialiased font-light hidden sm:block">
+            {description}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 md:mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20 md:mb-24">
             <button
-              className="btn-primary w-full sm:w-auto group flex items-center justify-center gap-2"
+              className="btn-primary bg-theme-blue hover:bg-theme-blue/90 text-white border-none px-10 py-4 rounded-full text-base font-semibold shadow-lg shadow-theme-blue/20 hover:shadow-theme-blue/40 transition-all duration-300 hover:-translate-y-1 flex items-center gap-2"
               onClick={onShopAll}
             >
-              Shop All Products
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Explore Products
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <a
-              href="/coa"
-              className="px-8 py-3 rounded-lg font-medium text-theme-text hover:text-theme-accent transition-colors flex items-center gap-2 w-full sm:w-auto justify-center"
+            <button
+              className="px-10 py-4 rounded-full text-base font-semibold text-white border border-theme-blue/30 hover:bg-theme-blue/10 transition-all duration-300 backdrop-blur-sm"
+              onClick={() => navigate('/assessment')}
             >
-              View Lab Tests & Quality Assurance
-              <ShieldCheck className="w-4 h-4" />
-            </a>
+              Start Assessment
+            </button>
           </div>
 
-          {/* Trust Indicators - Horizontal scrollable on mobile */}
-          <div className="flex flex-row items-stretch gap-4 md:gap-8 border-t border-gray-100 pt-8 md:pt-12 max-w-3xl mx-auto overflow-x-auto pb-2 scrollbar-hide">
-            <div className="flex flex-col items-center gap-2 group min-w-[100px] flex-1">
-              <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-gray-100 group-hover:border-theme-accent/30 transition-colors">
-                <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-theme-accent" />
+          {/* Trust Indicators */}
+          <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-5xl mx-auto border-t border-theme-blue/20 pt-8 md:pt-12 px-2 md:px-0">
+            <div className="flex flex-col items-center gap-2 md:gap-4 p-2 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-sm group">
+              <div className="p-2 md:p-3 bg-theme-blue/20 rounded-lg md:rounded-xl text-theme-lightblue mb-0 md:mb-1 group-hover:scale-110 transition-transform duration-300">
+                <ShieldCheck className="w-5 h-5 md:w-8 md:h-8" />
               </div>
-              <p className="font-semibold text-theme-text text-xs md:text-sm text-center">Lab Verified</p>
-              <p className="text-[10px] md:text-xs text-gray-400 text-center">Purity Guaranteed</p>
-            </div>
-            <div className="flex flex-col items-center gap-2 group min-w-[100px] flex-1">
-              <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-gray-100 group-hover:border-theme-secondary/30 transition-colors">
-                <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-theme-secondary" />
+              <div className="text-center">
+                <h3 className="font-bold text-white text-xs md:text-lg mb-0.5 md:mb-1">Lab Verified</h3>
+                <p className="text-[10px] md:text-sm text-gray-400 leading-tight">99%+ Purity</p>
               </div>
-              <p className="font-semibold text-theme-text text-xs md:text-sm text-center">Premium Quality</p>
-              <p className="text-[10px] md:text-xs text-gray-400 text-center">Sourced for Excellence</p>
             </div>
-            <div className="flex flex-col items-center gap-2 group min-w-[100px] flex-1">
-              <div className="p-2 md:p-3 bg-white rounded-xl shadow-sm border border-gray-100 group-hover:border-theme-accent/30 transition-colors">
-                <FlaskConical className="w-5 h-5 md:w-6 md:h-6 text-theme-accent" />
-              </div>
-              <p className="font-semibold text-theme-text text-xs md:text-sm text-center">Real-World Tested</p>
-              <p className="text-[10px] md:text-xs text-gray-400 text-center">Verified by Our Team</p>
-            </div>
-          </div>
 
-          {/* Real-World Tested Section */}
-          <div className="mt-12 md:mt-16 bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <FlaskConical className="w-5 h-5 text-theme-accent" />
-              <h3 className="font-bold text-theme-text">Real-World Tested</h3>
+            <div className="flex flex-col items-center gap-2 md:gap-4 p-2 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-sm group">
+              <div className="p-2 md:p-3 bg-theme-red/20 rounded-lg md:rounded-xl text-theme-red mb-0 md:mb-1 group-hover:scale-110 transition-transform duration-300">
+                <Sparkles className="w-5 h-5 md:w-8 md:h-8" />
+              </div>
+              <div className="text-center">
+                <h3 className="font-bold text-white text-xs md:text-lg mb-0.5 md:mb-1">Research Grade</h3>
+                <p className="text-[10px] md:text-sm text-gray-400 leading-tight">Excellence</p>
+              </div>
             </div>
-            <p className="text-sm md:text-base text-gray-600 leading-relaxed">
-              Every peptide and supply item is used and verified by our team and community before being offered in our shop. Quality you can feel — results you can trust.
-            </p>
+
+            <div className="flex flex-col items-center gap-2 md:gap-4 p-2 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors backdrop-blur-sm group">
+              <div className="p-2 md:p-3 bg-theme-blue/20 rounded-lg md:rounded-xl text-theme-lightblue mb-0 md:mb-1 group-hover:scale-110 transition-transform duration-300">
+                <FlaskConical className="w-5 h-5 md:w-8 md:h-8" />
+              </div>
+              <div className="text-center">
+                <h3 className="font-bold text-white text-xs md:text-lg mb-0.5 md:mb-1">Real-World</h3>
+                <p className="text-[10px] md:text-sm text-gray-400 leading-tight">Expert Verified</p>
+              </div>
+            </div>
           </div>
 
         </div>

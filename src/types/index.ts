@@ -11,6 +11,7 @@ export interface Product {
   discount_active: boolean;
 
   // Peptide-specific fields
+  concentration: string | null;
   purity_percentage: number;
   molecular_weight: string | null;
   cas_number: string | null;
@@ -66,19 +67,7 @@ export interface PaymentMethod {
   updated_at: string;
 }
 
-export interface PromoCode {
-  id: string;
-  code: string;
-  description: string | null;
-  discount_type: 'percentage' | 'fixed';
-  discount_value: number;
-  min_spend: number;
-  usage_limit: number | null;
-  usage_count: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+
 
 export interface SiteSetting {
   id: string;
@@ -127,4 +116,92 @@ export interface SiteSettings {
   home_hero_subtext: string;
   home_hero_tagline: string;
   home_hero_description: string;
+}
+
+// Assessment Types
+export interface AssessmentResponse {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+
+  // Demographics
+  age_range: string;
+  date_of_birth?: string;
+  sex_assigned?: 'male' | 'female' | 'other';
+  location: string;
+
+  // Physical Metrics
+  height_cm?: number;
+  weight_kg?: number;
+  waist_inches?: number;
+  hip_inches?: number;
+
+  // Goals & Motivators
+  goals: string[];
+  emotional_motivators?: string[];
+  weight_goal_kg?: number;
+
+  // Experience
+  experience_level: string;
+  peptide_experience_first_time?: boolean;
+  current_prescription_glp1?: boolean;
+
+  // Medical History
+  medical_conditions?: string[];
+  family_history_conditions?: string[];
+  current_medications?: string;
+  previous_surgeries?: boolean;
+  drug_allergies?: boolean;
+  smoking_status?: 'smoker' | 'non_smoker' | 'other';
+
+  // Pregnancy/Reproductive
+  pregnancy_status?: string[];
+
+  // Preferences
+  preferences: {
+    budget?: string;
+    frequency?: string;
+    [key: string]: any;
+  };
+
+  // System
+  consent_agreed: boolean;
+  recommendation_generated?: any;
+  created_at: string;
+  status: 'new' | 'reviewed' | 'contacted';
+}
+
+export interface RecommendationRule {
+  id: string;
+  rule_name: string;
+  target_goal: string;
+  target_experience: string;
+  primary_product_id: string | null;
+  secondary_product_ids: string[] | null;
+  educational_note: string | null;
+  priority: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Smart Guide System
+export interface SmartGuide {
+  id: string;
+  title: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  files?: SmartGuideFile[]; // For UI convenience
+}
+
+export interface SmartGuideFile {
+  id: string;
+  guide_id: string;
+  display_name: string;
+  file_url: string;
+  file_type: string;
+  sort_order: number;
+  created_at: string;
 }

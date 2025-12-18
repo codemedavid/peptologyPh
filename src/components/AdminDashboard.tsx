@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, ArrowLeft, Package, CreditCard, Sparkles, Layers, Shield, RefreshCw, Warehouse, ShoppingCart, HelpCircle, MapPin, Check, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, ArrowLeft, Package, CreditCard, Sparkles, Layers, Shield, RefreshCw, Warehouse, ShoppingCart, MapPin, Check, ClipboardList, FileText } from 'lucide-react';
 import type { Product } from '../types';
 import { useMenu } from '../hooks/useMenu';
 import { useCategories } from '../hooks/useCategories';
@@ -7,13 +7,12 @@ import ImageUpload from './ImageUpload';
 import CategoryManager from './CategoryManager';
 import PaymentMethodManager from './PaymentMethodManager';
 import VariationManager from './VariationManager';
-import COAManager from './COAManager';
 import PeptideInventoryManager from './PeptideInventoryManager';
 import OrdersManager from './OrdersManager';
-import FAQManager from './FAQManager';
 import ShippingManager from './ShippingManager';
-import SiteSettingsManager from './SiteSettingsManager';
-import PromoManager from './PromoManager';
+import JourneyManager from './admin/JourneyManager';
+import AssessmentManager from './admin/AssessmentManager';
+import SmartGuideManager from './admin/SmartGuideManager';
 
 
 const AdminDashboard: React.FC = () => {
@@ -24,7 +23,7 @@ const AdminDashboard: React.FC = () => {
   const [loginError, setLoginError] = useState('');
   const { products, loading, addProduct, updateProduct, deleteProduct, refreshProducts } = useMenu();
   const { categories } = useCategories();
-  const [currentView, setCurrentView] = useState<'dashboard' | 'products' | 'add' | 'edit' | 'categories' | 'payments' | 'coa' | 'inventory' | 'orders' | 'faq' | 'shipping' | 'settings' | 'promo'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'products' | 'add' | 'edit' | 'categories' | 'payments' | 'inventory' | 'orders' | 'shipping' | 'journey' | 'assessment' | 'guides'>('dashboard');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [managingVariationsProductId, setManagingVariationsProductId] = useState<string | null>(null);
@@ -370,7 +369,7 @@ const AdminDashboard: React.FC = () => {
           <div className="text-center mb-6">
             <div className="relative mx-auto w-16 h-16 rounded-full overflow-hidden mb-4 border-2 border-theme-accent/30">
               <img
-                src="/assets/logo.jpg"
+                src="/assets/logo.png"
                 alt="peptalk.ph"
                 className="w-full h-full object-cover"
               />
@@ -1053,33 +1052,7 @@ const AdminDashboard: React.FC = () => {
     return <PaymentMethodManager onBack={() => setCurrentView('dashboard')} />;
   }
 
-  // COA Lab Reports View
-  if (currentView === 'coa') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white">
-        <div className="bg-white shadow-md border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-3 sm:px-4">
-            <div className="flex items-center justify-between h-12 md:h-14">
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentView('dashboard')}
-                  className="text-gray-700 hover:text-theme-accent transition-colors flex items-center gap-1 group"
-                >
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                  <span className="text-xs md:text-sm">Dashboard</span>
-                </button>
-                <h1 className="text-sm md:text-base font-bold bg-gradient-to-r from-black to-gray-900 bg-clip-text text-transparent">🔬 Lab Reports (COA)</h1>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-4">
-          <COAManager />
-        </div>
-      </div>
-    );
-  }
 
   // Inventory View
   if (currentView === 'inventory') {
@@ -1091,50 +1064,46 @@ const AdminDashboard: React.FC = () => {
     return <OrdersManager onBack={() => setCurrentView('dashboard')} />;
   }
 
-  // FAQ View
-  if (currentView === 'faq') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white">
-        <div className="bg-white shadow-md border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-3 sm:px-4">
-            <div className="flex items-center justify-between h-12 md:h-14">
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentView('dashboard')}
-                  className="text-gray-700 hover:text-theme-accent transition-colors flex items-center gap-1 group"
-                >
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                  <span className="text-xs md:text-sm">Dashboard</span>
-                </button>
-                <h1 className="text-sm md:text-base font-bold bg-gradient-to-r from-black to-gray-900 bg-clip-text text-transparent">❓ FAQ Management</h1>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-4">
-          <FAQManager />
-        </div>
-      </div>
-    );
-  }
 
   // Shipping View
   if (currentView === 'shipping') {
     return <ShippingManager onBack={() => setCurrentView('dashboard')} />;
   }
 
-  // Site Settings View
-  // Site Settings View
-  if (currentView === 'settings') {
-    return <SiteSettingsManager onBack={() => setCurrentView('dashboard')} />;
-  }
 
-  // Promo Manager View
-  if (currentView === 'promo') {
+
+  // Journey Manager View
+  if (currentView === 'journey') {
     return (
       <div className="min-h-screen bg-theme-bg">
-        <PromoManager onBack={() => setCurrentView('dashboard')} />
+        <JourneyManager onBack={() => setCurrentView('dashboard')} />
+      </div>
+    );
+  }
+
+  // Assessment Manager View
+  if (currentView === 'assessment') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AssessmentManager onBack={() => setCurrentView('dashboard')} />
+      </div>
+    );
+  }
+
+  // Smart Guide View
+  if (currentView === 'guides') {
+    return (
+      <div className="min-h-screen bg-theme-bg p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <button onClick={() => setCurrentView('dashboard')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+          </div>
+          <SmartGuideManager />
+        </div>
       </div>
     );
   }
@@ -1311,57 +1280,47 @@ const AdminDashboard: React.FC = () => {
               <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Manage shipping.</p>
             </button>
 
-            {/* FAQ Manager Card */}
-            <button
-              onClick={() => setCurrentView('faq')}
-              className="bg-white p-4 md:p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-medium transition-all group text-left relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-yellow-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-              <div className="p-2 md:p-3 bg-yellow-50 rounded-lg w-fit mb-3 md:mb-4 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
-                <HelpCircle className="w-4 h-4 md:w-6 md:h-6 text-yellow-600 group-hover:text-white" />
-              </div>
-              <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-yellow-600 transition-colors">FAQ</h3>
-              <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Update FAQs.</p>
-            </button>
 
-            {/* COA Manager Card */}
-            <button
-              onClick={() => setCurrentView('coa')}
-              className="bg-white p-4 md:p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-medium transition-all group text-left relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-              <div className="p-2 md:p-3 bg-teal-50 rounded-lg w-fit mb-3 md:mb-4 group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                <Shield className="w-4 h-4 md:w-6 md:h-6 text-teal-600 group-hover:text-white" />
-              </div>
-              <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-teal-600 transition-colors">COA</h3>
-              <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Upload reports.</p>
-            </button>
 
-            {/* Site Settings Card */}
-            <button
-              onClick={() => setCurrentView('settings')}
-              className="bg-white p-4 md:p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-medium transition-all group text-left relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-              <div className="p-2 md:p-3 bg-gray-100 rounded-lg w-fit mb-3 md:mb-4 group-hover:bg-gray-800 group-hover:text-white transition-colors">
-                <Edit className="w-4 h-4 md:w-6 md:h-6 text-gray-600 group-hover:text-white" />
-              </div>
-              <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-gray-800 transition-colors">Settings</h3>
-              <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Site config.</p>
-            </button>
 
-            {/* Promo Vouchers Card */}
-            <button
-              onClick={() => setCurrentView('promo')}
-              className="bg-white p-4 md:p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-medium transition-all group text-left relative overflow-hidden"
+
+
+
+            {/* Journey Manager Card */}
+            <div
+              onClick={() => setCurrentView('journey')}
+              className="bg-white p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-lg transition-all cursor-pointer group"
             >
-              <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-              <div className="p-2 md:p-3 bg-pink-50 rounded-lg w-fit mb-3 md:mb-4 group-hover:bg-pink-500 group-hover:text-white transition-colors">
-                <Tag className="w-4 h-4 md:w-6 md:h-6 text-pink-600 group-hover:text-white" />
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-sm md:text-lg font-bold text-theme-text mb-1 md:mb-2 group-hover:text-pink-600 transition-colors">Vouchers</h3>
-              <p className="text-xs md:text-sm text-gray-500 line-clamp-2">Manage promos.</p>
-            </button>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Journey Page</h3>
+              <p className="text-sm text-gray-500">Edit content for "Our Journey"</p>
+            </div>
+
+            {/* Assessment System Card */}
+            <div
+              onClick={() => setCurrentView('assessment')}
+              className="bg-white p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-lg transition-all cursor-pointer group"
+            >
+              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-teal-600 mb-4 group-hover:scale-110 transition-transform">
+                <ClipboardList className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Assessment System</h3>
+              <p className="text-sm text-gray-500">Manage responses & rules</p>
+            </div>
+
+            {/* Smart Guide System Card */}
+            <div
+              onClick={() => setCurrentView('guides')}
+              className="bg-white p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-lg transition-all cursor-pointer group"
+            >
+              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600 mb-4 group-hover:scale-110 transition-transform">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Smart Guides</h3>
+              <p className="text-sm text-gray-500">Manage QR/files pages</p>
+            </div>
 
           </div>
         </div>

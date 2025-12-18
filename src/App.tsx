@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useCart } from './hooks/useCart';
 import Header from './components/Header';
+import Hero from './components/Hero';
+import CTASection from './components/CTASection';
 import SubNav from './components/SubNav';
 import MobileNav from './components/MobileNav';
 import Menu from './components/Menu';
@@ -10,14 +12,17 @@ import Checkout from './components/Checkout';
 import FloatingCartButton from './components/FloatingCartButton';
 import Footer from './components/Footer';
 import AdminDashboard from './components/AdminDashboard';
-import COA from './components/COA';
-import FAQ from './components/FAQ';
 import { useMenu } from './hooks/useMenu';
-import { useCOAPageSetting } from './hooks/useCOAPageSetting';
+import PeptideJourney from './pages/PeptideJourney';
+import AssessmentWizardV2 from './pages/AssessmentWizardV2';
+import AssessmentResults from './pages/AssessmentResults';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import SmartGuide from './pages/SmartGuide';
 
 function MainApp() {
   const cart = useCart();
-  const { menuItems, refreshProducts } = useMenu();
+  const { menuItems } = useMenu();
   const [currentView, setCurrentView] = React.useState<'menu' | 'cart' | 'checkout'>('menu');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
 
@@ -53,12 +58,20 @@ function MainApp() {
 
       <main className="flex-grow">
         {currentView === 'menu' && (
-          <Menu
-            menuItems={filteredProducts}
-            addToCart={cart.addToCart}
-            cartItems={cart.cartItems}
-            updateQuantity={cart.updateQuantity}
-          />
+          <>
+            <Hero
+              onShopAll={() => {
+                document.getElementById('product-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            />
+            <Menu
+              menuItems={filteredProducts}
+              addToCart={cart.addToCart}
+              cartItems={cart.cartItems}
+              updateQuantity={cart.updateQuantity}
+            />
+            <CTASection />
+          </>
         )}
 
         {currentView === 'cart' && (
@@ -95,15 +108,18 @@ function MainApp() {
   );
 }
 
-function App() {
-  const { coaPageEnabled } = useCOAPageSetting();
 
+function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<MainApp />} />
-        {coaPageEnabled && <Route path="/coa" element={<COA />} />}
-        <Route path="/faq" element={<FAQ />} />
+        <Route path="/journey" element={<PeptideJourney />} />
+        <Route path="/assessment" element={<AssessmentWizardV2 />} />
+        <Route path="/assessment/results" element={<AssessmentResults />} />
+        <Route path="/guides" element={<SmartGuide />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>

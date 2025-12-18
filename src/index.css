@@ -5,11 +5,12 @@
 @tailwind utilities;
 
 :root {
-  /* Minimalist Modern Theme */
-  --theme-bg: #F1EFE7;
-  --theme-text: #1E1E1E;
-  --theme-accent: #6DA8A1;
-  --theme-secondary: #C38E70;
+  /* Peptology Branding */
+  --theme-navy: #0B1F33;
+  --theme-blue: #2E8BC0;
+  --theme-lightblue: #E6F2FA;
+  --theme-white: #FFFFFF;
+  --theme-red: #E63946;
 
   --primary-black: #1E1E1E;
   --primary-white: #ffffff;

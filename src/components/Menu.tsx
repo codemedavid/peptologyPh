@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import MenuItemCard from './MenuItemCard';
-import Hero from './Hero';
 import ProductDetailModal from './ProductDetailModal';
 import type { Product, ProductVariation, CartItem } from '../types';
 import { Search, Filter, Package } from 'lucide-react';
@@ -60,13 +59,7 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems }) => {
       )}
 
       <div className="min-h-screen bg-theme-bg">
-        <Hero
-          onShopAll={() => {
-            productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        />
-
-        <div className="container mx-auto px-4 py-8" ref={productsRef}>
+        <div className="container mx-auto px-4 py-8" ref={productsRef} id="product-section">
           {/* Search and Filter Controls */}
           <div className="mb-8 flex flex-col sm:flex-row gap-4">
             {/* Search Bar */}
