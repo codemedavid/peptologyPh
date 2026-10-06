@@ -47,7 +47,106 @@ interface OrdersManagerProps {
   onBack: () => void;
 }
 
-const OrdersManager: React.FC<OrdersManagerProps> = ({ onBack }) => {
+const toNumber = (value: unknown): number => {
+  const n = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(n) ? n : 0;
+};
+
+const toText = (value: unknown): string => (value == null ? '' : String(value));
+
+// Orders come straight from the database and older/manually-edited rows may have
+// missing fields or order_items stored as a JSON string. Rendering any of those
+// unguarded throws and blanks the whole admin page, so coerce every row here.
+const normalizeOrder = (raw: Record<string, unknown>): Order => {
+  let items: unknown = raw.order_items;
+  if (typeof items === 'string') {
+    try {
+      items = JSON.parse(items);
+    } catch {
+      items = [];
+    }
+  }
+  const orderItems: OrderItem[] = (Array.isArray(items) ? items : [])
+    .filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
+    .map((item) => {
+      const quantity = toNumber(item.quantity);
+      const price = toNumber(item.price);
+      return {
+        product_id: toText(item.product_id),
+        product_name: toText(item.product_name) || 'Unknown product',
+        variation_id: item.variation_id ? toText(item.variation_id) : null,
+        variation_name: item.variation_name ? toText(item.variation_name) : null,
+        quantity,
+        price,
+        total: item.total == null ? price * quantity : toNumber(item.total),
+        purity_percentage: item.purity_percentage == null ? undefined : toNumber(item.purity_percentage),
+      };
+    });
+
+  return {
+    ...(raw as unknown as Order),
+    id: toText(raw.id),
+    customer_name: toText(raw.customer_name),
+    customer_email: toText(raw.customer_email),
+    customer_phone: toText(raw.customer_phone),
+    shipping_address: toText(raw.shipping_address),
+    shipping_city: toText(raw.shipping_city),
+    shipping_state: toText(raw.shipping_state),
+    shipping_zip_code: toText(raw.shipping_zip_code),
+    shipping_country: toText(raw.shipping_country),
+    shipping_fee: raw.shipping_fee == null ? null : toNumber(raw.shipping_fee),
+    order_items: orderItems,
+    total_price: toNumber(raw.total_price),
+    order_status: toText(raw.order_status) || 'new',
+    payment_status: toText(raw.payment_status) || 'pending',
+    created_at: toText(raw.created_at),
+    updated_at: toText(raw.updated_at),
+  };
+};
+
+class OrdersErrorBoundary extends React.Component<
+  { onBack: () => void; children: React.ReactNode },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Orders page crashed:', error);
+  }
+
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 max-w-md text-center">
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+          <p className="font-semibold text-gray-900 mb-2">Something went wrong while showing orders.</p>
+          <p className="text-xs text-gray-500 mb-4 break-words">{this.state.error.message}</p>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => this.setState({ error: null })}
+              className="px-4 py-2 bg-black text-white rounded-lg text-sm"
+            >
+              Try again
+            </button>
+            <button
+              onClick={this.props.onBack}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+const OrdersManagerContent: React.FC<OrdersManagerProps> = ({ onBack }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +169,7 @@ const OrdersManager: React.FC<OrdersManagerProps> = ({ onBack }) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+      setOrders((data || []).map(normalizeOrder));
     } catch (error) {
       console.error('Error loading orders:', error);
       alert('Failed to load orders. Please try again.');
@@ -487,7 +586,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onView, getStatusColor, ge
             <div>
               <span className="text-gray-500 text-[10px] md:text-xs">Total</span>
               <p className="font-semibold text-theme-secondary">₱{finalTotal.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-              {order.shipping_fee && order.shipping_fee > 0 && (
+              {(order.shipping_fee ?? 0) > 0 && (
                 <p className="text-[10px] md:text-xs text-gray-500">+ ₱{order.shipping_fee} shipping</p>
               )}
             </div>
@@ -680,10 +779,10 @@ const OrderDetailsView: React.FC<OrderDetailsViewProps> = ({
                 <span>Subtotal:</span>
                 <span className="font-semibold">₱{order.total_price.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</span>
               </div>
-              {order.shipping_fee && order.shipping_fee > 0 && (
+              {(order.shipping_fee ?? 0) > 0 && (
                 <div className="flex justify-between">
                   <span>Shipping Fee:</span>
-                  <span className="font-semibold">₱{order.shipping_fee.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</span>
+                  <span className="font-semibold">₱{(order.shipping_fee ?? 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</span>
                 </div>
               )}
               <div className="flex justify-between text-base md:text-lg font-bold border-t-2 border-gray-200 pt-2">
@@ -756,5 +855,11 @@ const OrderDetailsView: React.FC<OrderDetailsViewProps> = ({
     </div>
   );
 };
+
+const OrdersManager: React.FC<OrdersManagerProps> = ({ onBack }) => (
+  <OrdersErrorBoundary onBack={onBack}>
+    <OrdersManagerContent onBack={onBack} />
+  </OrdersErrorBoundary>
+);
 
 export default OrdersManager;
