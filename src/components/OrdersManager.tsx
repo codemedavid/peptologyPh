@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { ArrowLeft, Package, CheckCircle, XCircle, Clock, Truck, AlertCircle, Search, RefreshCw, Eye, MessageCircle, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useMenu } from '../hooks/useMenu';
@@ -152,6 +152,7 @@ const OrdersManagerContent: React.FC<OrdersManagerProps> = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const listScrollY = useRef(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { refreshProducts } = useMenu();
@@ -159,6 +160,20 @@ const OrdersManagerContent: React.FC<OrdersManagerProps> = ({ onBack }) => {
   useEffect(() => {
     loadOrders();
   }, []);
+
+  // The orders list is very long, so opening an order from far down kept the
+  // window scrolled past the (much shorter) details page and showed a blank
+  // screen. Jump to the top when opening an order and restore the list
+  // position when going back.
+  const selectedOrderId = selectedOrder?.id;
+  useLayoutEffect(() => {
+    window.scrollTo(0, selectedOrderId ? 0 : listScrollY.current);
+  }, [selectedOrderId]);
+
+  const openOrder = (order: Order) => {
+    listScrollY.current = window.scrollY;
+    setSelectedOrder(order);
+  };
 
   const loadOrders = async () => {
     try {
@@ -391,6 +406,7 @@ const OrdersManagerContent: React.FC<OrdersManagerProps> = ({ onBack }) => {
   if (selectedOrder) {
     return (
       <OrderDetailsView
+        key={selectedOrder.id}
         order={selectedOrder}
         onBack={() => setSelectedOrder(null)}
         onConfirm={() => handleConfirmOrder(selectedOrder)}
@@ -520,7 +536,7 @@ const OrdersManagerContent: React.FC<OrdersManagerProps> = ({ onBack }) => {
               <OrderCard
                 key={order.id}
                 order={order}
-                onView={() => setSelectedOrder(order)}
+                onView={() => openOrder(order)}
                 getStatusColor={getStatusColor}
                 getStatusIcon={getStatusIcon}
               />
@@ -631,6 +647,7 @@ const OrderDetailsView: React.FC<OrderDetailsViewProps> = ({
 }) => {
   const totalItems = order.order_items.reduce((sum, item) => sum + item.quantity, 0);
   const finalTotal = order.total_price + (order.shipping_fee || 0);
+  const [proofFailed, setProofFailed] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white">
@@ -740,20 +757,26 @@ const OrderDetailsView: React.FC<OrderDetailsViewProps> = ({
                 Payment Proof
               </h3>
               <div className="bg-gray-50 rounded-lg p-3 md:p-4">
-                <img
-                  src={order.payment_proof_url}
-                  alt="Payment proof"
-                  className="max-w-full h-auto rounded-lg border border-gray-300"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = `
-                      <div class="text-red-600 p-3 md:p-4 text-center text-xs md:text-sm">
-                        <p>⚠️ Payment proof image failed to load</p>
-                        <p class="text-[10px] md:text-xs text-gray-500 mt-2">URL: ${order.payment_proof_url}</p>
-                      </div>
-                    `;
-                  }}
-                />
+                {proofFailed ? (
+                  <div className="text-red-600 p-3 md:p-4 text-center text-xs md:text-sm">
+                    <p>⚠️ Payment proof image failed to load</p>
+                    <a
+                      href={order.payment_proof_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] md:text-xs text-gray-500 mt-2 underline break-all block"
+                    >
+                      {order.payment_proof_url}
+                    </a>
+                  </div>
+                ) : (
+                  <img
+                    src={order.payment_proof_url}
+                    alt="Payment proof"
+                    className="max-w-full h-auto rounded-lg border border-gray-300"
+                    onError={() => setProofFailed(true)}
+                  />
+                )}
               </div>
             </div>
           )}
